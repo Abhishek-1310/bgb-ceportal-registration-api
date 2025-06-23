@@ -23,12 +23,14 @@ Resources:
       Timeout: 10
       Environment:
         Variables:
+          USER_POOL_ID: ap-south-1_qmPd7G9Xm
           CLIENT_ID: 7hrt0lrvqsudpqjapgcgodve16
       Policies:
         - Statement:
             Effect: Allow
             Action:
               - cognito-idp:SignUp
+              - cognito-idp:AdminConfirmSignUp
             Resource: "*"
       Events:
         RegisterApi:

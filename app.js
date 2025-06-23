@@ -1,6 +1,7 @@
 const {
     CognitoIdentityProviderClient,
-    SignUpCommand
+    SignUpCommand,
+    AdminConfirmSignUpCommand
 } = require("@aws-sdk/client-cognito-identity-provider");
 
 const client = new CognitoIdentityProviderClient();
@@ -58,7 +59,7 @@ exports.handler = async (event) => {
         }
 
         // Construct signup command
-        const command = new SignUpCommand({
+        const signUpCommand = new SignUpCommand({
             ClientId: process.env.CLIENT_ID,
             Username: email,
             Password: password,
@@ -70,14 +71,22 @@ exports.handler = async (event) => {
             ]
         });
 
-        const response = await client.send(command);
+        const signUpResponse = await client.send(signUpCommand);
+
+        // Automatically confirm user after signup
+        const confirmCommand = new AdminConfirmSignUpCommand({
+            UserPoolId: process.env.USER_POOL_ID,  // make sure this is set in environment variables
+            Username: email,
+        });
+
+        await client.send(confirmCommand);
 
         return {
             statusCode: 201,
             headers: corsHeaders,
             body: JSON.stringify({
-                message: "Registration successful. Please verify your email.",
-                userSub: response.UserSub
+                message: "Registration successful and user confirmed.",
+                userSub: signUpResponse.UserSub
             }),
         };
     } catch (err) {
