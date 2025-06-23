@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  RegisterApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: user-registration-api
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  RegisterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: user-registration-handler
+      Handler: app.handler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          CLIENT_ID: 7hrt0lrvqsudpqjapgcgodve16
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - cognito-idp:SignUp
+            Resource: "*"
+      Events:
+        RegisterApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RegisterApiGateway
+            Path: /register
+            Method: POST
