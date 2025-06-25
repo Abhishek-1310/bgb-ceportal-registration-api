@@ -29,12 +29,11 @@ exports.handler = async (event) => {
             lastName,
             email,
             password,
-            ['confirm Password']: confirmPassword,
-            ['accept Terms']: acceptTerms
+            acceptTerms // now a string, e.g. "true"
         } = body;
 
         // Validate required fields
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !acceptTerms) {
+        if (!firstName || !lastName || !email || !password || acceptTerms !== "true") {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
@@ -42,15 +41,7 @@ exports.handler = async (event) => {
             };
         }
 
-        if (password !== confirmPassword) {
-            return {
-                statusCode: 400,
-                headers: corsHeaders,
-                body: JSON.stringify({ error: "Passwords do not match." }),
-            };
-        }
-
-        if (!acceptTerms) {
+        if (acceptTerms !== "true") {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
@@ -75,7 +66,7 @@ exports.handler = async (event) => {
 
         // Automatically confirm user after signup
         const confirmCommand = new AdminConfirmSignUpCommand({
-            UserPoolId: process.env.USER_POOL_ID,  // make sure this is set in environment variables
+            UserPoolId: process.env.USER_POOL_ID,
             Username: email,
         });
 
