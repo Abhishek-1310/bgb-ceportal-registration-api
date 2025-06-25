@@ -29,11 +29,12 @@ exports.handler = async (event) => {
             lastName,
             email,
             password,
-            acceptTerms // now a string, e.g. "true"
+            role,
+            acceptTerms
         } = body;
 
         // Validate required fields
-        if (!firstName || !lastName || !email || !password || acceptTerms !== "true") {
+        if (!firstName || !lastName || !email || !password || acceptTerms !== "true" || !role) {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
@@ -58,7 +59,8 @@ exports.handler = async (event) => {
                 { Name: "email", Value: email },
                 { Name: "given_name", Value: firstName },
                 { Name: "family_name", Value: lastName },
-                { Name: "custom:title", Value: title || "" }
+                { Name: "custom:title", Value: title || "" },
+                { Name: "custom:role", Value: role }
             ]
         });
 
